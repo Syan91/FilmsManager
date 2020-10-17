@@ -2,12 +2,23 @@ package ru.netology.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.netology.domain.FilmItem;
+import ru.netology.repository.FilmRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 
 public class FilmManagerTestMoreThenDefault {
-    private FilmManager manager;
+    @Mock
+    private FilmRepository repository;
+    @InjectMocks
+    private FilmManager manager = new FilmManager(repository);
     private FilmItem first = new FilmItem(1, "Бладшот", "боевик");
     private FilmItem second = new FilmItem(2, "Вперёд", "мультфильм");
     private FilmItem third = new FilmItem(3, "Отель «Белград»", "комедия");
@@ -28,39 +39,34 @@ public class FilmManagerTestMoreThenDefault {
 
     @BeforeEach
     public void setUp() {
-        manager = new FilmManager(15);
-        manager.filmAdd(first);
-        manager.filmAdd(second);
-        manager.filmAdd(third);
-        manager.filmAdd(fourth);
-        manager.filmAdd(fifth);
-        manager.filmAdd(sixth);
-        manager.filmAdd(seventh);
-        manager.filmAdd(eighth);
-        manager.filmAdd(ninth);
-        manager.filmAdd(tenth);
-        manager.filmAdd(eleventh);
-        manager.filmAdd(twelfth);
-        manager.filmAdd(thirteenth);
-        manager.filmAdd(fourteenth);
-        manager.filmAdd(fifteenth);
+        manager = new FilmManager(repository, 15);
     }
 
     @Test
     public void shouldDisplayLastFifteenIfFifteen() {
+        FilmItem[] returned = new FilmItem[]{first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelfth, thirteenth, fourteenth, fifteenth};
+        doReturn(returned).when(repository).findAll();
+
         FilmItem[] expected = new FilmItem[]{fifteenth, fourteenth, thirteenth, twelfth, eleventh, tenth, ninth, eighth, seventh, sixth, fifth, fourth, third, second, first};
         FilmItem[] actual = manager.getAll();
         assertArrayEquals(expected, actual);
+
+        verify(repository).findAll();
     }
 
     @Test
     public void shouldDisplayLastFifteenIfMoreFifteen() {
-        manager.filmAdd(sixteen);
+        FilmItem[] returned = new FilmItem[]{first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelfth, thirteenth, fourteenth, fifteenth, sixteen};
+        doReturn(returned).when(repository).findAll();
+
         FilmItem[] expected = new FilmItem[]{sixteen, fifteenth, fourteenth, thirteenth, twelfth, eleventh, tenth, ninth, eighth, seventh, sixth, fifth, fourth, third, second};
         FilmItem[] actual = manager.getAll();
         assertArrayEquals(expected, actual);
+
+        verify(repository).findAll();
     }
 }
+
 
 
 
